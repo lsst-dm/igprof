@@ -1,0 +1,57 @@
+From f792080dab824573f0681a031ca506182e9b7ae7 Mon Sep 17 00:00:00 2001
+From: Paul Price <price@astro.princeton.edu>
+Date: Wed, 11 Apr 2018 15:44:16 -0400
+Subject: [PATCH 3/3] Disable PAPI search
+
+On the Princeton tiger cluster, this finds something, but it's not what it
+expected. Presumably this feature needs better configuration to be used
+properly.
+---
+ CMakeLists.txt | 24 ------------------------
+ 1 file changed, 24 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 57fe6b5..b3eee5e 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -36,24 +36,6 @@ IF(${CMAKE_SYSTEM_PROCESSOR} MATCHES arm OR ${CMAKE_SYSTEM_PROCESSOR} MATCHES aa
+   ENDIF()
+ ENDIF()
+ 
+-# Find PAPI library
+-IF(PAPI_INCLUDE_DIR AND PAPI_LIBRARY)
+-  SET(PAPI_FOUND TRUE)
+-ELSE(PAPI_INCLUDE_DIR AND PAPI_LIBRARY)
+-  FIND_PATH(PAPI_INCLUDE_DIR NAMES papi.h
+-            PATHS /usr/include /usr/local/include)
+-  FIND_LIBRARY(PAPI_LIBRARY NAMES papi
+-               PATHS /usr/lib /usr/local/lib)
+-  IF(PAPI_INCLUDE_DIR AND PAPI_LIBRARY)
+-    SET(PAPI_FOUND TRUE)
+-  ELSE(PAPI_INCLUDE_DIR AND PAPI_LIBRARY)
+-    SET(PAPI_FOUND FALSE)
+-  ENDIF(PAPI_INCLUDE_DIR AND PAPI_LIBRARY)
+-ENDIF(PAPI_INCLUDE_DIR AND PAPI_LIBRARY)
+-IF(PAPI_FOUND)
+-  SET(IGPROF_LIBS ${IGPROF_LIBS} ${PAPI_LIBRARY})
+-ENDIF(PAPI_FOUND)
+-
+ CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.cmake
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h)
+ 
+@@ -115,12 +97,6 @@ IF(PCRE_FOUND)
+ ELSE()
+   INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR} ${UNWIND_INCLUDE_DIR})
+ ENDIF()
+-IF(PAPI_FOUND)
+-  # Treat the directory containing papi.h as a system include directory in
+-  # order to suppress the "comma at end of enumerator list" error. The PAPI
+-  # header file does not conform to ANSI C.
+-  INCLUDE_DIRECTORIES(SYSTEM ${PAPI_INCLUDE_DIR})
+-ENDIF()
+ ADD_LIBRARY(igprof SHARED
+             src/hook.cc
+             src/buffer.cc
+-- 
+2.16.2
+
